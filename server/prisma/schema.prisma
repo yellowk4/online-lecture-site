@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int          @id @default(autoincrement())
+  email        String       @unique
+  passwordHash String       @map("password_hash")
+  name         String
+  role         String       @default("student") // student | admin
+  enrollments  Enrollment[]  // 여러 개의 수강신청 관계 선언
+  progresses   Progress[]    // 여러 개의 진도 관계 선언
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  @@map("users") // @map / @@map이 하는 일 — 이름 번역기
+}
+
+model Course {         // 시리즈: TypeScript 입문 강좌 (과정)
+  id          Int          @id @default(autoincrement())
+  title       String
+  description String
+  thumbnail   String
+  instructor  String    // 강사
+  lectures    Lecture[]
+  enrollments Enrollment[]
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  @@map("courses")
+}
+
+model Lecture {       //  3강. 변수와 타입 (차시)
+  id         Int        @id @default(autoincrement())
+  courseId   Int        @map("course_id")
+  course     Course     @relation(fields: [courseId], references: [id]) // 외래키
+  title      String
+  duration   Int // 초 단위
+  videoUrl   String     @map("video_url")
+  order      Int // 10, 20, 30... 띄워서 저장(사이에 새강의 삽입을 위해), 재생 순서
+  progresses Progress[]
+
+  @@map("lectures")
+}
+
+model Enrollment {    //수강신청,  User와 Course의 다대다를 Enrollment라는 중간 모델로 풀어놓은 것
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  user      User      @relation(fields: [userId], references: [id])
+  courseId  Int       @map("course_id")
+  course    Course    @relation(fields: [courseId], references: [id])
+  createdAt DateTime  @default(now()) @map("created_at")
+  expiresAt DateTime? @map("expires_at") // null = 무제한, 만료일
+
+  @@unique([userId, courseId])
+  @@map("enrollments")
+}
+
+model Progress {      // 진도
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+  lectureId Int      @map("lecture_id")
+  lecture   Lecture  @relation(fields: [lectureId], references: [id])
+  position  Int      @default(0) // 초 단위, 마지막 재생 위치
+  completed Boolean  @default(false)
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, lectureId])
+  @@map("progresses")
+}

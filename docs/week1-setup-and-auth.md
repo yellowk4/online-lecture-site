@@ -35,7 +35,7 @@ npm i express cors dotenv bcryptjs jsonwebtoken zod
 ```
 
 ```bash
-npm i -D typescript tsx @types/express @types/cors @types/bcryptjs @types/jsonwebtoken prisma
+npm i -D typescript tsx @types/express @types/cors @types/bcryptjs @types/jsonwebtoken prisma@6
 ```
 
 ```bash
@@ -136,8 +136,12 @@ shadcn/ui는 지금 셋업만 (`npx shadcn@latest init`), 컴포넌트는 필요
 ## 2. Prisma 스키마 + 시드 (2h)
 
 ```bash
-cd server && npx prisma init
+cd server && npx prisma init --datasource-provider postgresql
 ```
+
+> ⚠️ 반드시 **prisma@6**이 설치되어 있어야 한다 (`npx prisma --version`으로 확인).
+> prisma 8(RC)은 CLI가 재편되어 `init`이 `schema.prisma`를 만들지 않는다.
+> 클라이언트 라이브러리도 버전을 맞춰 설치: `npm i @prisma/client@6`
 
 `server/prisma/schema.prisma` 전체를 아래로 교체:
 
@@ -269,13 +273,17 @@ async function main() {
 main().finally(() => prisma.$disconnect());
 ```
 
-`server/package.json` 에 추가:
+`server/prisma.config.ts` 의 `migrations`에 seed 등록:
 
-```json
-{
-  "prisma": { "seed": "tsx prisma/seed.ts" }
-}
+```ts
+migrations: {
+  path: "prisma/migrations",
+  seed: "tsx prisma/seed.ts",   // ← 추가
+},
 ```
+
+> 참고: `package.json`에 `"prisma": { "seed": ... }` 키를 넣는 건 구식 방법으로,
+> `prisma.config.ts`가 존재하는 프로젝트에서는 **무시된다.** 반드시 config 파일에 등록할 것.
 
 ```bash
 npx prisma db seed

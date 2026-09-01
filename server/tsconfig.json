@@ -43,5 +43,6 @@
     "skipLibCheck": true,
 
     "moduleResolution": "nodenext",
-  }
+  },
+   "include": ["src"] // src 폴더만 컴파일 대상이다
 }
