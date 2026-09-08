@@ -7,13 +7,16 @@ export interface AuthedRequest extends Request {
   userId?: number;
 }
 
+// 로그인한 사람만 통과시키는 미들웨어
 export function requireAuth(req: AuthedRequest, res: Response, next: NextFunction) {
   const header = req.headers.authorization;
   if (!header?.startsWith('Bearer ')) {
     return fail(res, 401, 'UNAUTHORIZED', '로그인이 필요합니다.');
   }
   try {
-    const payload = jwt.verify(header.slice(7), process.env.JWT_SECRET!) as { sub: string | number };
+    const payload = jwt.verify(header.slice(7), process.env.JWT_SECRET!) as {
+      sub: string | number;
+    };
     req.userId = Number(payload.sub);
     next();
   } catch {
