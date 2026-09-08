@@ -7,7 +7,13 @@ const HLS_SAMPLES = [
 ];
 
 async function main() {
-  for (let c = 1; c <= 2; c++) {
+  // 여러 번 실행해도 결과가 같도록 기존 샘플 데이터를 먼저 지운다 (사용자 계정은 유지)
+  // 외래키 순서: enrollments, lectures가 courses를 참조하므로 자식부터 삭제
+  await prisma.enrollment.deleteMany();
+  await prisma.lecture.deleteMany();
+  await prisma.course.deleteMany();
+
+  for (let c = 1; c <= 12; c++) {
     const course = await prisma.course.create({
       data: {
         title: `샘플 강의 코스 ${c}`,

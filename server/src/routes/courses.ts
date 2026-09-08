@@ -1,8 +1,23 @@
-import { Router } from 'express';
+import { Router, type Request } from 'express';
+import jwt from 'jsonwebtoken';
 import { prisma } from '../lib/prisma.js';
 import { fail } from '../lib/errors.js';
 
 const router = Router();
+
+// 토큰이 있으면 userId를, 없거나 유효하지 않으면 null을 돌려준다 (비로그인도 통과)
+function tryGetUserId(req: Request): number | null {
+  const header = req.headers.authorization;
+  if (!header?.startsWith('Bearer ')) return null;
+  try {
+    const payload = jwt.verify(header.slice(7), process.env.JWT_SECRET!) as {
+      sub: string | number;
+    };
+    return Number(payload.sub);
+  } catch {
+    return null;
+  }
+}
 
 // GET /api/courses?page=1&size10
 router.get('/', async (req, res) => {
@@ -60,7 +75,17 @@ router.get('/:id', async (req, res) => {
   });
 
   if (!course) return fail(res, 404, 'COURSE_NOT_FOUND', '강좌를 찾을 수 없습니다.');
-  res.json(course);
+
+  // 내 수강 여부: 로그인했으면 확인, 아니면 false
+  const userId = tryGetUserId(req);
+  const enrolled = userId
+    ? !!(await prisma.enrollment.findUnique({
+        // !! 를 붙여서 null이면 false, 있으면 true로 변환
+        where: { userId_courseId: { userId, courseId: id } },
+      }))
+    : false;
+
+  res.json({ ...course, enrolled }); // enrolled: true/false 추가
 });
 
 export default router;
