@@ -20,11 +20,16 @@ router.get('/:id/playback', requireAuth, async (req: AuthedRequest, res) => {
   const enrollment = await prisma.enrollment.findUnique({
     where: { userId_courseId: { userId: req.userId!, courseId: lecture.course.id } },
   });
-  if (!enrollment) return fail(res, 403, 'NOT_ENROLLED', '수강 중인 강좌가 아닙니다.');
+  if (!enrollment) return fail(res, 403, 'NOT_ENROLLED', '수강 중인 강의가 아닙니다.');
   if (enrollment.expiresAt && enrollment.expiresAt < new Date())
     return fail(res, 403, 'ENROLLMENT_EXPIRED', '수강 기간이 만료되었습니다.');
 
-  res.json({ url: lecture.videoUrl, expiresIn: 600 });
+  res.json({
+    url: lecture.videoUrl,
+    expiresIn: 600,
+    courseId: lecture.course.id,
+    title: lecture.title,
+  });
 });
 
 export default router;
