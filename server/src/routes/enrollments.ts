@@ -14,7 +14,7 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
 
   const course = await prisma.course.findUnique({ where: { id: courseId } });
   if (!course) {
-    return fail(res, 404, 'COURSE_NOT_FOUND', '강의를 찾을 수 없습니다.');
+    return fail(res, 404, 'COURSE_NOT_FOUND', '강좌를 찾을 수 없습니다.');
   }
 
   try {
@@ -28,7 +28,7 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
   } catch (e: any) {
     // any 타입 개선 필요
     if (e.code === 'P2002') {
-      return fail(res, 409, 'ALREADY_ENROLLED', '이미 수강 중인 강의입니다.');
+      return fail(res, 409, 'ALREADY_ENROLLED', '이미 수강 중인 강좌입니다.');
     }
     throw e;
   }

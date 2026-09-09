@@ -47,7 +47,7 @@ router.get('/', async (req, res) => {
     items: items.map((c) => ({ ...c, lectureCount: c._count.lectures, _count: undefined })), // _count 제거하고 lectureCount로 바꿔서 응답
     page, // 현재 페이지
     size, // 한 페이지에 몇 개 가져왔는지
-    total, // 전체 강의 갯수
+    total, // 전체 강좌 갯수
     totalPages: Math.ceil(total / size), // 전체 페이지 수, 올림처리
   });
 });

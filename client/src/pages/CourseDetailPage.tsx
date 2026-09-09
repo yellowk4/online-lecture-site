@@ -36,7 +36,7 @@ export default function CourseDetailPage() {
     },
     onError: (err) => {
       if (getApiErrorCode(err) === 'ALREADY_ENROLLED') {
-        // alert('이미 수강 중인 강의입니다.');
+        // alert('이미 수강 중인 강좌입니다.');
         queryClient.invalidateQueries({ queryKey: ['course', courseId] });
       } else {
         alert('수강 신청에 실패했습니다.');

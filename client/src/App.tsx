@@ -7,6 +7,7 @@ import RequireAuth from '@/components/RequireAuth';
 import { Navigate } from 'react-router-dom';
 import CoursesPage from '@/pages/CoursesPage';
 import CourseDetailPage from '@/pages/CourseDetailPage';
+import LearnPage from '@/pages/LearnPage';
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ function App() {
           <Route path="/courses/:id" element={<CourseDetailPage />} />
           <Route element={<RequireAuth />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/learn/:lectureId" element={<LearnPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -16,8 +16,8 @@ async function main() {
   for (let c = 1; c <= 12; c++) {
     const course = await prisma.course.create({
       data: {
-        title: `샘플 강의 코스 ${c}`,
-        description: `코스 ${c}에 대한 설명입니다. 5개의 강의로 구성되어 있습니다.`,
+        title: `샘플 강좌 ${c}`,
+        description: `강좌 ${c}에 대한 설명입니다. 5개의 강의로 구성되어 있습니다.`,
         thumbnail: `https://picsum.photos/seed/course${c}/640/360`,
         instructor: `강사 ${c}`,
       },

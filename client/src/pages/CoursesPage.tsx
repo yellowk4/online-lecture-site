@@ -20,7 +20,7 @@ export default function CoursesPage() {
 
   return (
     <div className="mx-auto max-w-5xl p-8">
-      <h1 className="mb-6 text-2xl font-bold">강의 목록</h1>
+      <h1 className="mb-6 text-2xl font-bold">강좌 목록</h1>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {data.items.map((c) => (
           <Link
